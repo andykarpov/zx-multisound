@@ -26,6 +26,8 @@ Sound card for ZX Spectrum (NemoBus).
     * C3,C5,C17,C18 slightly moved left;
     * Added ledge on edge connector;
     * Improved SAM2695 footprint for hand soldering.
+* Rev.KA2:
+    * Single SRAM chip 2mb
 Sound card has been tested only with ZX Evolution. You can use it with another computer at your own risk.
 
 ### Related projects
