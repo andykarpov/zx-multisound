@@ -82,7 +82,7 @@ wire ym_ena  = cfg[0];
 wire saa_ena = cfg[1];
 wire gs_ena  = cfg[2];
 wire sd_ena  = cfg[3];
-
+wire beeper_ena = cfg[4];
 
 /* CLOCKS */
 reg [5:0] clk3_5_cnt = 0;
@@ -143,7 +143,6 @@ assign saa_clk = saa_clk_en? clk8 : 1'b0;
 
 /* MIDI */
 assign midi_clk = clk12;
-
 
 /* GENERAL SOUND */
 assign gclk = clk16;
@@ -278,6 +277,23 @@ wire sd_dac1_wr = sd_dac1_cs && ~n_wr;
 wire sd_dac2_wr = sd_dac2_cs && ~n_wr;
 wire sd_dac3_wr = sd_dac3_cs && ~n_wr;
 
+/* BEEPER */
+wire port_xxfe      = ~a[0] && beeper_ena;
+reg beeper = 0;
+reg beeper_wr;
+always @(posedge clk32 or negedge rst_n) begin
+	if (!rst_n) begin
+        beeper <= 0;
+		  beeper_wr <= 0;
+    end
+    else begin
+		  beeper_wr <= 0;
+        if (port_xxfe && ioreq_wr) begin
+            beeper <= d[4];
+				beeper_wr <= 1;
+		  end
+    end
+end
 
 /* DAC */
 reg [5:0] vol0, vol1, vol2, vol3;
@@ -291,11 +307,16 @@ always @(posedge clk32 or negedge rst_n) begin
     else begin
         if      (sd_dac0_wr) vol0 <= 6'b111111;
         else if (gs_vol0_wr) vol0 <= gd[5:0];
+		  else if (beeper_wr) vol0 <= 6'b111111;
+		  
         if      (sd_dac1_wr) vol1 <= 6'b111111;
         else if (gs_vol1_wr) vol1 <= gd[5:0];
-        if      (sd_dac2_wr) vol2 <= 6'b111111;
+		  else if (beeper_wr) vol1 <= 6'b111111;
+        
+		  if      (sd_dac2_wr) vol2 <= 6'b111111;
         else if (gs_vol2_wr) vol2 <= gd[5:0];
-        if      (sd_dac3_wr) vol3 <= 6'b111111;
+        
+		  if      (sd_dac3_wr) vol3 <= 6'b111111;
         else if (gs_vol3_wr) vol3 <= gd[5:0];
     end
 end
@@ -312,10 +333,15 @@ always @(posedge clk32 or negedge rst_n) begin
         // quartus bug(?): without second condition inside "IF" expression incorrect design may be generated
         if (sd_dac0_wr && !gs_dac0_wr) dac0 <= ( d[7]?  d : { d[7], ~d[6:0]});
         else if           (gs_dac0_wr) dac0 <= (gd[7]? gd : {gd[7],~gd[6:0]});
+		  else if (beeper_wr) dac0 <= {2'b00, beeper, 5'b00};
+		  
         if (sd_dac1_wr && !gs_dac1_wr) dac1 <= ( d[7]?  d : { d[7], ~d[6:0]});
         else if           (gs_dac1_wr) dac1 <= (gd[7]? gd : {gd[7],~gd[6:0]});
+		  else if (beeper_wr) dac1 <= {2'b00, beeper, 5'b00};
+
         if (sd_dac2_wr && !gs_dac2_wr) dac2 <= ( d[7]?  d : { d[7], ~d[6:0]});
         else if           (gs_dac2_wr) dac2 <= (gd[7]? gd : {gd[7],~gd[6:0]});
+
         if (sd_dac3_wr && !gs_dac3_wr) dac3 <= ( d[7]?  d : { d[7], ~d[6:0]});
         else if           (gs_dac3_wr) dac3 <= (gd[7]? gd : {gd[7],~gd[6:0]});
     end
