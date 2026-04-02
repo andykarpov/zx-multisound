@@ -64121,7 +64121,7 @@
 			)
 		)
 	)
-	(gr_text "SW1.1 - Enable TSFM + MIDI\nSW1.2 - Enable SAA1099\nSW1.3 - Enable GS\nSW1.4 - Enable SounDrive\nSW1.5 - Reserved"
+	(gr_text "SW1.1 - Enable TSFM + MIDI\nSW1.2 - Enable SAA1099\nSW1.3 - Enable GS\nSW1.4 - Enable SounDrive\nSW1.5 - Enable Beeper"
 		(at 178.15 79.35 0)
 		(layer "B.SilkS")
 		(uuid "cc593650-f879-488d-b100-1c3e94ed6a51")
