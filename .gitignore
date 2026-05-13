@@ -27,7 +27,7 @@ cpld/tb/*.raw
 cpld/tb/*.net
 cpld/tb/*.log
 cpld/tb/111.txt
-cpld.*/
+#cpld.*/
 
 ## Etc.
 refs/
